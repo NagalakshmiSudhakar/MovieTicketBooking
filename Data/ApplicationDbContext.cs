@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MovieTicketBooking.Models;
 
 namespace MovieTicketBooking.Data
 {
@@ -7,6 +8,8 @@ namespace MovieTicketBooking.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+
         }
+        public DbSet<Movie> Movies { get; set; }
     }
 }
