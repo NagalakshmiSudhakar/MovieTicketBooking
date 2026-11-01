@@ -21,6 +21,10 @@ builder.Services.AddScoped<IScreenRepository, ScreenRepository>();
 builder.Services.AddScoped<IScreenService, ScreenService>();
 builder.Services.AddScoped<ISeatRepository, SeatRepository>();
 builder.Services.AddScoped<ISeatService, SeatService>();
+builder.Services.AddScoped<IShowRepository, ShowRepository>();
+builder.Services.AddScoped<IShowService, ShowService>();
+builder.Services.AddScoped<IShowSeatRepository, ShowSeatRepository>();
+builder.Services.AddScoped<IShowSeatService, ShowSeatService>();
 builder.Services.AddControllers();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
