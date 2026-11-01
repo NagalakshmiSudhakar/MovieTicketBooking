@@ -1,13 +1,15 @@
 ﻿# Theatre Module – Implementation Documentation
 
 ## 1. Objective
-Implement Theatre Management functionality in the Movie Ticket Booking System using ASP.NET Core Web API, Entity Framework Core and SQL Server.
+
+Implemented Theatre Management functionality in the Movie Ticket Booking System using ASP.NET Core Web API, Entity Framework Core and SQL Server.
 
 ## 2. Database Configuration
+
 Created the `Theatre` entity with the following properties:
 
 | Property | Description |
-| ---| ---|
+|---|---|
 | TheatreId | Primary key, Identity |
 | Name | Required, maximum 150 characters |
 | Location | Required, maximum 200 characters |
@@ -19,24 +21,24 @@ Created and applied the `CreateTheatreTable` migration.
 ## 3. Implementation Details
 
 **DTOs**
-- `CreateTheatreRequest`
-- `UpdateTheatreRequest`
-- `TheatreResponse`
+- CreateTheatreRequest
+- UpdateTheatreRequest
+- TheatreResponse
 
 **Repository**
-- `ITheatreRepository`
-- `TheatreRepository`
+- ITheatreRepository
+- TheatreRepository
 
 Implemented database operations for adding, retrieving, updating and deleting theatres.
 
 **Service**
-- `ITheatreService`
-- `TheatreService`
+- ITheatreService
+- TheatreService
 
 Implemented business logic and DTO-to-entity mapping.
 
 **Controller**
-- `TheatresController`
+- TheatresController
 
 Implemented REST API endpoints for Theatre management.
 
@@ -48,14 +50,14 @@ Implemented REST API endpoints for Theatre management.
 | GET | `/api/theatres` | Retrieve all theatres |
 | GET | `/api/theatres/{id}` | Retrieve theatre by ID |
 | PUT | `/api/theatres/{id}` | Update theatre |
-| DELETE | `/ api / theatres /{ id}` | Delete theatre |
+| DELETE | `/api/theatres/{id}` | Delete theatre |
 
 ## 5. Dependency Injection
 
 Registered the following services in `Program.cs`:
 
-- `ITheatreRepository` → `TheatreRepository`
-- `ITheatreService` → `TheatreService`
+- ITheatreRepository → TheatreRepository
+- ITheatreService → TheatreService
 
 ## 6. Testing
 
