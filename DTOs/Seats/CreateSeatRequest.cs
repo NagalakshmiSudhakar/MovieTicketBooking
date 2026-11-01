@@ -1,0 +1,22 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MovieTicketBooking.DTOs.Seats
+{
+    public class CreateSeatRequest
+    {
+        [Required]
+        public int ScreenId { get; set; }
+
+        [Required]
+        [StringLength(5)]
+        public string RowName { get; set; } = string.Empty;
+
+        [Required]
+        [Range(1, int.MaxValue)]
+        public int SeatNumber { get; set; }
+
+        [Required]
+        [StringLength(30)]
+        public string SeatType { get; set; } = string.Empty;
+    }
+}
