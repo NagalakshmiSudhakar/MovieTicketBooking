@@ -5,6 +5,8 @@ using MovieTicketBooking.DTOs.Bookings;
 using MovieTicketBooking.Models;
 using MovieTicketBooking.Repositories.Interfaces;
 using MovieTicketBooking.Services.Interfaces;
+using MovieTicketBooking.Exceptions;
+using System.Security.Claims;
 
 namespace MovieTicketBooking.Services
 {
@@ -14,35 +16,45 @@ namespace MovieTicketBooking.Services
         private readonly IBookingRepository _bookingRepository;
         private readonly IShowRepository _showRepository;
         private readonly IShowSeatRepository _showSeatRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public BookingService(
-            ApplicationDbContext context,
-            IBookingRepository bookingRepository,
-            IShowRepository showRepository,
-            IShowSeatRepository showSeatRepository)
+             ApplicationDbContext context,
+             IBookingRepository bookingRepository,
+             IShowRepository showRepository,
+             IShowSeatRepository showSeatRepository,
+            IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _bookingRepository = bookingRepository;
             _showRepository = showRepository;
             _showSeatRepository = showSeatRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<BookingResponse> CreateBookingAsync(
             CreateBookingRequest request)
         {
+            var userId = _httpContextAccessor.HttpContext?
+    .User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new UnauthorizedException("User is not authenticated.");
+            }
             if (request.SeatIds == null || request.SeatIds.Count == 0)
-                throw new InvalidOperationException("Select at least one seat.");
+                throw new BadRequestException("Select at least one seat.");
 
             if (request.SeatIds.Any(id => id <= 0))
-                throw new InvalidOperationException("Invalid seat ID.");
+                throw new BadRequestException("Invalid seat ID.");
 
             if (request.SeatIds.Distinct().Count() != request.SeatIds.Count)
-                throw new InvalidOperationException("Duplicate seat IDs are not allowed.");
+                throw new BadRequestException("Duplicate seat IDs are not allowed.");
 
             var show = await _showRepository.GetByIdAsync(request.ShowId);
 
             if (show == null)
-                throw new KeyNotFoundException("Show not found.");
+                throw new NotFoundException("Show not found.");
 
             var showSeats = await _showSeatRepository
                 .GetByShowIdAsync(request.ShowId);
@@ -52,11 +64,11 @@ namespace MovieTicketBooking.Services
                 .ToList();
 
             if (selectedSeats.Count != request.SeatIds.Count)
-                throw new InvalidOperationException(
+                throw new ConflictException(
                     "One or more seats do not belong to this show.");
 
             if (selectedSeats.Any(ss => ss.Status != "Available"))
-                throw new InvalidOperationException(
+                throw new ConflictException(
                     "One or more selected seats are already booked.");
 
             await using var transaction =
@@ -68,6 +80,7 @@ namespace MovieTicketBooking.Services
                 {
                     BookingReference = $"MOV{Guid.NewGuid():N}"[..15],
                     ShowId = request.ShowId,
+                    UserId = userId,
                     CustomerName = request.CustomerName,
                     CustomerEmail = request.CustomerEmail,
                     CustomerPhone = request.CustomerPhone,
@@ -75,7 +88,6 @@ namespace MovieTicketBooking.Services
                     TotalAmount = show.TicketPrice * selectedSeats.Count,
                     Status = "Confirmed"
                 };
-
                 await _bookingRepository.AddAsync(booking);
 
                 var bookingSeats = selectedSeats.Select(ss => new BookingSeat
@@ -106,10 +118,47 @@ namespace MovieTicketBooking.Services
         }
 
         public async Task<List<BookingResponse>> GetAllBookingsAsync(
-            int? showId,
-            string? status)
+    int? showId,
+    string? status)
         {
-            var bookings = await _bookingRepository.GetAllAsync(showId, status);
+            List<Booking> bookings;
+
+            var currentUser = _httpContextAccessor.HttpContext?.User;
+
+            if (currentUser == null || !currentUser.Identity!.IsAuthenticated)
+            {
+                throw new UnauthorizedException("User is not authenticated.");
+            }
+
+            if (currentUser.IsInRole("Admin"))
+            {
+                bookings = await _bookingRepository.GetAllAsync(showId, status);
+            }
+            else
+            {
+                var userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    throw new UnauthorizedException("User ID not found.");
+                }
+
+                bookings = await _bookingRepository.GetByUserIdAsync(userId);
+
+                if (showId.HasValue)
+                {
+                    bookings = bookings
+                        .Where(b => b.ShowId == showId.Value)
+                        .ToList();
+                }
+
+                if (!string.IsNullOrEmpty(status))
+                {
+                    bookings = bookings
+                        .Where(b => b.Status == status)
+                        .ToList();
+                }
+            }
 
             var responses = new List<BookingResponse>();
 
@@ -123,23 +172,73 @@ namespace MovieTicketBooking.Services
 
         public async Task<BookingResponse?> GetBookingByIdAsync(int bookingId)
         {
+            var currentUser = _httpContextAccessor.HttpContext?.User;
+
+            if (currentUser == null || !currentUser.Identity!.IsAuthenticated)
+            {
+                throw new UnauthorizedException("User is not authenticated.");
+            }
+
             var booking = await _bookingRepository.GetByIdAsync(bookingId);
 
             if (booking == null)
                 return null;
+
+            // Admin can access every booking
+            if (currentUser.IsInRole("Admin"))
+            {
+                return await BuildBookingResponseAsync(booking);
+            }
+
+            // Customer can access only their own booking
+            var userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new UnauthorizedException("User ID not found.");
+            }
+
+            if (booking.UserId != userId)
+            {
+                throw new NotFoundException("Booking not found.");
+            }
 
             return await BuildBookingResponseAsync(booking);
         }
+        
 
         public async Task<BookingResponse?> CancelBookingAsync(int bookingId)
         {
+            var currentUser = _httpContextAccessor.HttpContext?.User;
+
+            if (currentUser == null || !currentUser.Identity!.IsAuthenticated)
+            {
+                throw new UnauthorizedException("User is not authenticated.");
+            }
+
             var booking = await _bookingRepository.GetByIdAsync(bookingId);
 
             if (booking == null)
                 return null;
 
+            // Admin can cancel any booking
+            if (!currentUser.IsInRole("Admin"))
+            {
+                var userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    throw new UnauthorizedException("User ID not found.");
+                }
+
+                if (booking.UserId != userId)
+                {
+                    throw new NotFoundException("Booking not found.");
+                }
+            }
+
             if (booking.Status != "Confirmed")
-                throw new InvalidOperationException(
+                throw new ConflictException(
                     "Only confirmed bookings can be cancelled.");
 
             var bookingSeats = await _bookingRepository

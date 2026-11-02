@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MovieTicketBooking.Models;
 
 namespace MovieTicketBooking.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -137,9 +138,9 @@ namespace MovieTicketBooking.Data
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(s => s.Screen)
-    .WithMany()
-    .HasForeignKey(s => s.ScreenId)
-    .OnDelete(DeleteBehavior.Restrict);
+                .WithMany()
+                .HasForeignKey(s => s.ScreenId)
+                .OnDelete(DeleteBehavior.Restrict);
 
                 entity.ToTable(t =>
                 {
@@ -220,40 +221,41 @@ namespace MovieTicketBooking.Data
                     .HasForeignKey(b => b.ShowId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-               
-               
-
                 entity.ToTable(t =>
                     t.HasCheckConstraint(
                         "CK_Bookings_TotalAmount",
                         "[TotalAmount] >= 0"));
-
-                modelBuilder.Entity<BookingSeat>(entity =>
-                {
-                    entity.HasKey(bs => bs.BookingSeatId);
-
-                    entity.Property(bs => bs.Price)
-                        .HasPrecision(10, 2)
-                        .IsRequired();
-
-                    entity.HasOne<Booking>()
-                        .WithMany()
-                        .HasForeignKey(bs => bs.BookingId)
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    entity.HasOne<Seat>()
-                        .WithMany()
-                        .HasForeignKey(bs => bs.SeatId)
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    entity.ToTable(t =>
-                        t.HasCheckConstraint(
-                            "CK_BookingSeats_Price",
-                            "[Price] >= 0"));
-                });
-
             });
 
+
+            modelBuilder.Entity<BookingSeat>(entity =>
+            {
+                entity.HasKey(bs => bs.BookingSeatId);
+
+                entity.Property(bs => bs.Price)
+                    .HasPrecision(10, 2)
+                    .IsRequired();
+
+                entity.HasOne<Booking>()
+                    .WithMany()
+                    .HasForeignKey(bs => bs.BookingId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne<Seat>()
+                    .WithMany()
+                    .HasForeignKey(bs => bs.SeatId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.ToTable(t =>
+                    t.HasCheckConstraint(
+                        "CK_BookingSeats_Price",
+                        "[Price] >= 0"));
+            });
+            modelBuilder.Entity<Booking>()
+            .HasOne(b => b.User)
+            .WithMany()
+            .HasForeignKey(b => b.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

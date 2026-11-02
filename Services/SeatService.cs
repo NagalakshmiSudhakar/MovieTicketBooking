@@ -1,23 +1,47 @@
-﻿using MovieTicketBooking.DTOs.Seats;
+﻿
+using Microsoft.EntityFrameworkCore;
+using MovieTicketBooking.Data;
+using MovieTicketBooking.DTOs.Seats;
 using MovieTicketBooking.Models;
 using MovieTicketBooking.Repositories.Interfaces;
 using MovieTicketBooking.Services.Interfaces;
+using MovieTicketBooking.Exceptions;
 
 namespace MovieTicketBooking.Services
 {
     public class SeatService : ISeatService
     {
         private readonly ISeatRepository _seatRepository;
+        private readonly IScreenRepository _screenRepository;
+        private readonly ApplicationDbContext _context;
 
-        public SeatService(ISeatRepository seatRepository)
+        public SeatService(
+            ISeatRepository seatRepository,
+            IScreenRepository screenRepository,
+            ApplicationDbContext context)
         {
             _seatRepository = seatRepository;
+            _screenRepository = screenRepository;
+            _context = context;
+        }
+
+        // Validate screen existence
+        private async Task ValidateScreenAsync(int screenId)
+        {
+            var screen = await _screenRepository.GetByIdAsync(screenId);
+
+            if (screen == null)
+            {
+                throw new NotFoundException("Screen not found.");
+            }
         }
 
         // Create one seat
         public async Task<SeatResponse> CreateSeatAsync(
             CreateSeatRequest request)
         {
+            await ValidateScreenAsync(request.ScreenId);
+
             bool exists = await _seatRepository.ExistsAsync(
                 request.ScreenId,
                 request.RowName,
@@ -25,7 +49,7 @@ namespace MovieTicketBooking.Services
 
             if (exists)
             {
-                throw new InvalidOperationException(
+                throw new ConflictException(
                     "A seat with the same row and seat number already exists in this screen.");
             }
 
@@ -46,6 +70,8 @@ namespace MovieTicketBooking.Services
         public async Task<List<SeatResponse>> BulkCreateSeatsAsync(
             BulkCreateSeatsRequest request)
         {
+            await ValidateScreenAsync(request.ScreenId);
+
             var duplicateSeats = request.Seats
                 .GroupBy(s => new
                 {
@@ -56,7 +82,7 @@ namespace MovieTicketBooking.Services
 
             if (duplicateSeats)
             {
-                throw new InvalidOperationException(
+                throw new ConflictException(
                     "Duplicate seat coordinates found in the request.");
             }
 
@@ -69,7 +95,7 @@ namespace MovieTicketBooking.Services
 
                 if (exists)
                 {
-                    throw new InvalidOperationException(
+                    throw new ConflictException(
                         $"Seat {seat.RowName}{seat.SeatNumber} already exists in this screen.");
                 }
             }
@@ -91,6 +117,8 @@ namespace MovieTicketBooking.Services
         public async Task<List<SeatResponse>> GetSeatsByScreenIdAsync(
             int screenId)
         {
+            await ValidateScreenAsync(screenId);
+
             var seats = await _seatRepository.GetByScreenIdAsync(screenId);
 
             return seats.Select(MapToResponse).ToList();
@@ -116,6 +144,8 @@ namespace MovieTicketBooking.Services
                 return null;
             }
 
+            await ValidateScreenAsync(request.ScreenId);
+
             bool duplicateExists = await _seatRepository.ExistsAsync(
                 request.ScreenId,
                 request.RowName,
@@ -126,7 +156,7 @@ namespace MovieTicketBooking.Services
                  seat.RowName != request.RowName ||
                  seat.SeatNumber != request.SeatNumber))
             {
-                throw new InvalidOperationException(
+                throw new ConflictException(
                     "A seat with the same row and seat number already exists in this screen.");
             }
 
@@ -150,9 +180,17 @@ namespace MovieTicketBooking.Services
                 return false;
             }
 
-            await _seatRepository.DeleteAsync(seat);
+            try
+            {
+                await _seatRepository.DeleteAsync(seat);
 
-            return true;
+                return true;
+            }
+            catch (DbUpdateException)
+            {
+                throw new ConflictException(
+                    "This seat cannot be deleted because it is associated with existing shows or bookings.");
+            }
         }
 
         // Map entity to response DTO

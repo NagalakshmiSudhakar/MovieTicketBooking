@@ -3,6 +3,7 @@ using MovieTicketBooking.DTOs.Shows;
 using MovieTicketBooking.Models;
 using MovieTicketBooking.Repositories.Interfaces;
 using MovieTicketBooking.Services.Interfaces;
+using MovieTicketBooking.Exceptions;
 
 namespace MovieTicketBooking.Services
 {
@@ -28,7 +29,7 @@ namespace MovieTicketBooking.Services
         {
             if (request.EndTime <= request.StartTime)
             {
-                throw new InvalidOperationException(
+                throw new BadRequestException(
                     "End time must be later than start time.");
             }
 
@@ -40,7 +41,7 @@ namespace MovieTicketBooking.Services
 
             if (hasOverlap)
             {
-                throw new InvalidOperationException(
+                throw new ConflictException(
                     "This screen already has a show scheduled during the selected time.");
             }
 
@@ -49,7 +50,7 @@ namespace MovieTicketBooking.Services
 
             if (physicalSeats.Count == 0)
             {
-                throw new InvalidOperationException(
+                throw new BadRequestException(
                     "No physical seats are configured for this screen.");
             }
 
@@ -155,7 +156,7 @@ namespace MovieTicketBooking.Services
 
             if (request.EndTime <= request.StartTime)
             {
-                throw new InvalidOperationException(
+                throw new BadRequestException(
                     "End time must be later than start time.");
             }
 
@@ -168,7 +169,7 @@ namespace MovieTicketBooking.Services
 
             if (hasOverlap)
             {
-                throw new InvalidOperationException(
+                throw new ConflictException(
                     "This screen already has a show scheduled during the selected time.");
             }
 

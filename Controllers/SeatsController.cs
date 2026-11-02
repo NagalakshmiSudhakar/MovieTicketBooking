@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MovieTicketBooking.DTOs.Seats;
 using MovieTicketBooking.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MovieTicketBooking.Controllers
 {
@@ -17,6 +18,7 @@ namespace MovieTicketBooking.Controllers
 
         // POST: api/seats
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateSeat(
             [FromBody] CreateSeatRequest request)
         {
@@ -37,6 +39,7 @@ namespace MovieTicketBooking.Controllers
 
         // POST: api/seats/bulk
         [HttpPost("bulk")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> BulkCreateSeats(
             [FromBody] BulkCreateSeatsRequest request)
         {
@@ -54,6 +57,7 @@ namespace MovieTicketBooking.Controllers
 
         // GET: api/seats/screen/1
         [HttpGet("screen/{screenId}")]
+
         public async Task<IActionResult> GetSeatsByScreenId(int screenId)
         {
             if (screenId <= 0)
@@ -82,6 +86,7 @@ namespace MovieTicketBooking.Controllers
 
         // PUT: api/seats/1
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateSeat(
             int id,
             [FromBody] UpdateSeatRequest request)
@@ -105,6 +110,7 @@ namespace MovieTicketBooking.Controllers
 
         // DELETE: api/seats/1
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteSeat(int id)
         {
             bool deleted = await _seatService.DeleteSeatAsync(id);

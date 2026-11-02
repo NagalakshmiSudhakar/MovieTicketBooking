@@ -13,7 +13,7 @@ namespace MovieTicketBooking.Repositories.Interfaces
         Task<Booking?> GetByIdAsync(int bookingId);
 
         Task AddBookingSeatsAsync(List<BookingSeat> bookingSeats);
-
+        Task<List<Booking>> GetByUserIdAsync(string userId);
         Task UpdateAsync(Booking booking);
     }
 }

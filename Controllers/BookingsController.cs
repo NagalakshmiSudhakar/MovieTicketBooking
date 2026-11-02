@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using MovieTicketBooking.DTOs.Bookings;
+using Microsoft.AspNetCore.Authorization;
 using MovieTicketBooking.Services.Interfaces;
 
 namespace MovieTicketBooking.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = "AdminOrCustomer")]
     public class BookingsController : ControllerBase
     {
         private readonly IBookingService _bookingService;
@@ -20,39 +23,28 @@ namespace MovieTicketBooking.Controllers
         public async Task<ActionResult<BookingResponse>> CreateBooking(
             CreateBookingRequest request)
         {
-            try
-            {
-                var booking = await _bookingService.CreateBookingAsync(request);
+            var booking = await _bookingService.CreateBookingAsync(request);
 
-                return CreatedAtAction(
-                    nameof(GetBookingById),
-                    new { id = booking.BookingId },
-                    booking);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(new { message = ex.Message });
-            }
+            return CreatedAtAction(
+                nameof(GetBookingById),
+                new { id = booking.BookingId },
+                booking);
         }
 
         // GET: api/bookings
-        // GET: api/bookings?showId=1&status=Confirmed
         [HttpGet]
         public async Task<ActionResult<List<BookingResponse>>> GetAllBookings(
             [FromQuery] int? showId,
             [FromQuery] string? status)
         {
-            var bookings = await _bookingService.GetAllBookingsAsync(showId, status);
+            var bookings = await _bookingService.GetAllBookingsAsync(
+                showId, status);
 
             return Ok(bookings);
         }
 
         // GET: api/bookings/1
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<BookingResponse>> GetBookingById(int id)
         {
             var booking = await _bookingService.GetBookingByIdAsync(id);
@@ -67,19 +59,12 @@ namespace MovieTicketBooking.Controllers
         [HttpPut("{id}/cancel")]
         public async Task<ActionResult<BookingResponse>> CancelBooking(int id)
         {
-            try
-            {
-                var booking = await _bookingService.CancelBookingAsync(id);
+            var booking = await _bookingService.CancelBookingAsync(id);
 
-                if (booking == null)
-                    return NotFound(new { message = "Booking not found." });
+            if (booking == null)
+                return NotFound(new { message = "Booking not found." });
 
-                return Ok(booking);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(new { message = ex.Message });
-            }
+            return Ok(booking);
         }
     }
 }

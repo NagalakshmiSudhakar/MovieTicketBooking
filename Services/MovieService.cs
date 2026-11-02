@@ -1,7 +1,11 @@
-﻿using MovieTicketBooking.DTOs.Movies;
+﻿
+using Microsoft.EntityFrameworkCore;
+using MovieTicketBooking.DTOs.Movies;
 using MovieTicketBooking.Models;
 using MovieTicketBooking.Repositories.Interfaces;
 using MovieTicketBooking.Services.Interfaces;
+
+using MovieTicketBooking.Exceptions;
 
 namespace MovieTicketBooking.Services
 {
@@ -47,7 +51,8 @@ namespace MovieTicketBooking.Services
             var movie = await _movieRepository.GetByIdAsync(movieId);
 
             if (movie == null)
-                return null;
+                throw new NotFoundException(
+                    $"Movie with ID {movieId} not found.");
 
             return MapToResponse(movie);
         }
@@ -59,7 +64,8 @@ namespace MovieTicketBooking.Services
             var movie = await _movieRepository.GetByIdAsync(movieId);
 
             if (movie == null)
-                return null;
+                throw new NotFoundException(
+                    $"Movie with ID {movieId} not found.");
 
             movie.Title = request.Title;
             movie.Description = request.Description;
@@ -79,9 +85,18 @@ namespace MovieTicketBooking.Services
             var movie = await _movieRepository.GetByIdAsync(movieId);
 
             if (movie == null)
-                return false;
+                throw new NotFoundException(
+                    $"Movie with ID {movieId} not found.");
 
-            await _movieRepository.DeleteAsync(movie);
+            try
+            {
+                await _movieRepository.DeleteAsync(movie);
+            }
+            catch (DbUpdateException)
+            {
+                throw new ConflictException(
+                    "Cannot delete this movie because it is associated with existing shows.");
+            }
 
             return true;
         }

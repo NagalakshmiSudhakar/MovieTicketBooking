@@ -20,5 +20,9 @@ namespace MovieTicketBooking.Models
         public decimal TotalAmount { get; set; }
 
         public string Status { get; set; } = "Confirmed";
+
+        public string? UserId { get; set; }
+
+        public ApplicationUser? User { get; set; }
     }
 }
