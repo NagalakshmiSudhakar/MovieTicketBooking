@@ -25,9 +25,3 @@ Each model will be developed completely with its
 respective DbContext configuration, repository,
 service, controller and Postman testing.
 
-## Commit Convention
-
-We follow Conventional Commits.
-
-Format:
-type(scope): description
