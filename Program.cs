@@ -1,29 +1,35 @@
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using MovieTicketBooking.Authorization.Handlers;
+using MovieTicketBooking.Authorization.Requirements;
 using MovieTicketBooking.Data;
+using MovieTicketBooking.Middleware;
+using MovieTicketBooking.Models;
 using MovieTicketBooking.Repositories;
 using MovieTicketBooking.Repositories.Interfaces;
 using MovieTicketBooking.Services;
 using MovieTicketBooking.Services.Interfaces;
-using MovieTicketBooking.Middleware;
-using Microsoft.AspNetCore.Identity;
-using MovieTicketBooking.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+// JWT Authentication
 builder.Services
     .AddAuthentication(options =>
     {
@@ -47,8 +53,11 @@ builder.Services
                     builder.Configuration["Jwt:Key"]!))
         };
     });
+
+// Authorization Policies
 builder.Services.AddAuthorization(options =>
 {
+    // Existing role-based policies
     options.AddPolicy("AdminOnly", policy =>
         policy.RequireRole("Admin"));
 
@@ -57,25 +66,44 @@ builder.Services.AddAuthorization(options =>
 
     options.AddPolicy("AdminOrCustomer", policy =>
         policy.RequireRole("Admin", "Customer"));
+
+    // Custom resource-based authorization policy
+    options.AddPolicy("BookingOwner", policy =>
+    {
+        policy.AddRequirements(new BookingOwnerRequirement());
+    });
 });
 
-// Add services to the container.
+// Custom Authorization Handler
+builder.Services.AddScoped<IAuthorizationHandler, BookingOwnerHandler>();
+
+// Repository and Service Registrations
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 builder.Services.AddScoped<IMovieService, MovieService>();
+
 builder.Services.AddScoped<ITheatreRepository, TheatreRepository>();
 builder.Services.AddScoped<ITheatreService, TheatreService>();
+
 builder.Services.AddScoped<IScreenRepository, ScreenRepository>();
 builder.Services.AddScoped<IScreenService, ScreenService>();
+
 builder.Services.AddScoped<ISeatRepository, SeatRepository>();
 builder.Services.AddScoped<ISeatService, SeatService>();
+
 builder.Services.AddScoped<IShowRepository, ShowRepository>();
 builder.Services.AddScoped<IShowService, ShowService>();
+
 builder.Services.AddScoped<IShowSeatRepository, ShowSeatRepository>();
 builder.Services.AddScoped<IShowSeatService, ShowSeatService>();
+
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IBookingService, BookingService>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
+
 builder.Services.AddHttpContextAccessor();
+
+// CORS Configuration
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AngularFrontend", policy =>
@@ -85,12 +113,13 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
-builder.Services.AddControllers();
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+// Seed Roles and Admin Account
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider
@@ -99,7 +128,6 @@ using (var scope = app.Services.CreateScope())
     var userManager = scope.ServiceProvider
         .GetRequiredService<UserManager<ApplicationUser>>();
 
-    // Create roles
     string[] roles = { "Admin", "Customer" };
 
     foreach (var role in roles)
@@ -158,7 +186,7 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    // Ensure the account has the Admin role
+    // Ensure Admin role is assigned
     if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
     {
         var roleResult = await userManager.AddToRoleAsync(
@@ -170,15 +198,17 @@ using (var scope = app.Services.CreateScope())
         }
     }
 }
+
 app.UseExceptionHandler();
 
-// Configure the HTTP request pipeline.
+// HTTP Request Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
+
 app.UseCors("AngularFrontend");
 
 app.UseAuthentication();

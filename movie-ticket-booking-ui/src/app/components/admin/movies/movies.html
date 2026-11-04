@@ -1,0 +1,234 @@
+
+<div class="movies-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1>Movie Management</h1>
+      <p>View and manage all movies in CineLavender.</p>
+    </div>
+
+    <button class="btn btn-primary" (click)="openAddForm()">
+      + Add Movie
+    </button>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage()" class="success-message">
+    {{ successMessage() }}
+  </div>
+
+  <!-- Add / Edit Movie Form -->
+  <div class="table-container add-movie-form" *ngIf="showAddForm()">
+
+    <div class="table-heading">
+      <div>
+        <h2>{{ editingMovieId() !== null ? 'Edit Movie' : 'Add New Movie' }}</h2>
+        <p>
+          {{
+ editingMovieId() !== null
+            ? 'Update the movie details below.'
+            : 'Enter the movie details below.'
+          }}
+        </p>
+      </div>
+
+      <button class="close-btn" type="button" (click)="closeAddForm()">
+        ✕ Close
+      </button>
+    </div>
+
+    <form #movieForm="ngForm"
+          (ngSubmit)="editingMovieId() !== null ? updateMovie() : addMovie()">
+
+      <div class="form-grid">
+
+        <!-- Movie Title -->
+        <div class="form-group">
+          <label for="title">Movie Title</label>
+          <input type="text"
+                 id="title"
+                 name="title"
+                 [(ngModel)]="newMovie.title"
+                 required
+                 maxlength="150"
+                 placeholder="Enter movie title">
+        </div>
+
+        <!-- Duration -->
+        <div class="form-group">
+          <label for="durationMinutes">Duration (Minutes)</label>
+          <input type="number"
+                 id="durationMinutes"
+                 name="durationMinutes"
+                 [(ngModel)]="newMovie.durationMinutes"
+                 required
+                 min="1"
+                 placeholder="Example: 164">
+        </div>
+
+        <!-- Description -->
+        <div class="form-group full-width">
+          <label for="description">Description</label>
+          <textarea id="description"
+                    name="description"
+                    [(ngModel)]="newMovie.description"
+                    maxlength="500"
+                    rows="3"
+                    placeholder="Enter movie description"></textarea>
+        </div>
+
+        <!-- Release Date -->
+        <div class="form-group">
+          <label for="releaseDate">Release Date</label>
+          <input type="date"
+                 id="releaseDate"
+                 name="releaseDate"
+                 [(ngModel)]="newMovie.releaseDate"
+                 required>
+        </div>
+
+        <!-- Language -->
+        <div class="form-group">
+          <label for="language">Language</label>
+          <input type="text"
+                 id="language"
+                 name="language"
+                 [(ngModel)]="newMovie.language"
+                 required
+                 maxlength="50"
+                 placeholder="Example: Tamil">
+        </div>
+
+        <!-- Genre -->
+        <div class="form-group">
+          <label for="genre">Genre</label>
+          <input type="text"
+                 id="genre"
+                 name="genre"
+                 [(ngModel)]="newMovie.genre"
+                 required
+                 maxlength="50"
+                 placeholder="Example: Action">
+        </div>
+
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="errorMessage()" class="error-message">
+        {{ errorMessage() }}
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+
+        <button type="submit"
+                class="save-btn"
+                [disabled]="movieForm.invalid || isSaving()">
+
+          {{
+ isSaving()
+            ? 'Saving...'
+            : (editingMovieId() !== null ? 'Update Movie' : 'Save Movie')
+          }}
+
+        </button>
+
+        <button type="button"
+                class="cancel-btn"
+                (click)="closeAddForm()">
+          Cancel
+        </button>
+
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Movie Summary -->
+  <div class="movie-summary">
+    <div class="summary-card">
+      <span>🎬</span>
+      <div>
+        <h2>{{ movies().length }}</h2>
+        <p>Total Movies</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Movies Table -->
+  <div class="table-container">
+
+    <div class="table-heading">
+      <h2>All Movies</h2>
+
+      <button class="refresh-btn" (click)="loadMovies()">
+        ↻ Refresh
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading()" class="message">
+      Loading movies...
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="errorMessage() && !showAddForm()" class="error-message">
+      {{ errorMessage() }}
+    </div>
+
+    <!-- Movie List -->
+    <div class="table-responsive"
+         *ngIf="!isLoading() && (!errorMessage() || showAddForm())">
+
+      <table>
+        <thead>
+          <tr>
+            <th>Movie ID</th>
+            <th>Title</th>
+            <th>Language</th>
+            <th>Genre</th>
+            <th>Duration</th>
+            <th>Release Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr *ngFor="let movie of movies()">
+
+            <td>{{ movie.movieId }}</td>
+            <td class="movie-title">{{ movie.title }}</td>
+            <td>{{ movie.language }}</td>
+            <td>{{ movie.genre }}</td>
+            <td>{{ movie.durationMinutes }} min</td>
+            <td>{{ movie.releaseDate | date:'dd MMM yyyy' }}</td>
+
+            <td>
+              <button class="edit-btn"
+                      (click)="editMovie(movie)">
+                Edit
+              </button>
+
+              <button class="delete-btn" disabled>
+                Delete
+              </button>
+            </td>
+
+          </tr>
+
+          <tr *ngIf="movies().length === 0">
+            <td colspan="7" class="empty-message">
+              No movies found.
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

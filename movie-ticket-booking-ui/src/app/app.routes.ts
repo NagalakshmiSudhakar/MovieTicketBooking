@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { Register } from './components/auth/register/register';
 import { Login } from './components/auth/login/login';
 import { Dashboard } from './components/admin/dashboard/dashboard';
+import { Movies } from './components/admin/movies/movies';
 import { authGuard } from './guards/auth-guard';
 import { roleGuard } from './guards/role-guard';
 import { Home } from './components/home/home';
@@ -16,6 +17,12 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: Dashboard,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'Admin' }
+  },
+  {
+    path: 'admin/movies',
+    component: Movies,
     canActivate: [authGuard, roleGuard],
     data: { role: 'Admin' }
   },
