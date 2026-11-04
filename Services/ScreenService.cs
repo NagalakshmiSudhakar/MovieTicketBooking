@@ -1,5 +1,5 @@
-﻿using MovieTicketBooking.DTOs.Screens;
-using MovieTicketBooking.Models;
+﻿
+using MovieTicketBooking.DTOs.Screens;
 using MovieTicketBooking.Repositories.Interfaces;
 using MovieTicketBooking.Services.Interfaces;
 
@@ -17,7 +17,7 @@ namespace MovieTicketBooking.Services
         public async Task<ScreenResponse> CreateScreenAsync(
             CreateScreenRequest request)
         {
-            var screen = new Screen
+            var screen = new MovieTicketBooking.Models.Screen
             {
                 TheatreId = request.TheatreId,
                 ScreenName = request.ScreenName
@@ -82,7 +82,8 @@ namespace MovieTicketBooking.Services
             return true;
         }
 
-        private static ScreenResponse MapToResponse(Screen screen)
+        private static ScreenResponse MapToResponse(
+            MovieTicketBooking.Models.Screen screen)
         {
             return new ScreenResponse
             {

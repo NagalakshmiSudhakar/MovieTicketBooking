@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MovieTicketBooking.Models;
 
@@ -9,17 +10,19 @@ namespace MovieTicketBooking.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-
         }
+
         public DbSet<Movie> Movies { get; set; }
         public DbSet<Theatre> Theatres { get; set; }
-        public DbSet<Screen> Screens { get; set; }
+
+        public DbSet<MovieTicketBooking.Models.Screen> Screens { get; set; }
+
         public DbSet<Seat> Seats { get; set; }
         public DbSet<Show> Shows { get; set; }
         public DbSet<ShowSeat> ShowSeats { get; set; }
         public DbSet<Booking> Bookings { get; set; }
-
         public DbSet<BookingSeat> BookingSeats { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -71,7 +74,7 @@ namespace MovieTicketBooking.Data
             });
 
             // Screen configuration
-            modelBuilder.Entity<Screen>(entity =>
+            modelBuilder.Entity<MovieTicketBooking.Models.Screen>(entity =>
             {
                 entity.HasKey(s => s.ScreenId);
 
@@ -85,6 +88,7 @@ namespace MovieTicketBooking.Data
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
+            // Seat configuration
             modelBuilder.Entity<Seat>(entity =>
             {
                 entity.HasKey(s => s.SeatId);
@@ -100,7 +104,7 @@ namespace MovieTicketBooking.Data
                     .IsRequired()
                     .HasMaxLength(30);
 
-                entity.HasOne<Screen>()
+                entity.HasOne<MovieTicketBooking.Models.Screen>()
                     .WithMany()
                     .HasForeignKey(s => s.ScreenId)
                     .OnDelete(DeleteBehavior.Restrict);
@@ -118,6 +122,7 @@ namespace MovieTicketBooking.Data
                         "[SeatNumber] > 0"));
             });
 
+            // Show configuration
             modelBuilder.Entity<Show>(entity =>
             {
                 entity.HasKey(s => s.ShowId);
@@ -138,9 +143,9 @@ namespace MovieTicketBooking.Data
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(s => s.Screen)
-                .WithMany()
-                .HasForeignKey(s => s.ScreenId)
-                .OnDelete(DeleteBehavior.Restrict);
+                    .WithMany()
+                    .HasForeignKey(s => s.ScreenId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 entity.ToTable(t =>
                 {
@@ -154,6 +159,7 @@ namespace MovieTicketBooking.Data
                 });
             });
 
+            // ShowSeat configuration
             modelBuilder.Entity<ShowSeat>(entity =>
             {
                 entity.HasKey(ss => ss.ShowSeatId);
@@ -181,7 +187,7 @@ namespace MovieTicketBooking.Data
                         "[Status] IN ('Available', 'Booked')"));
             });
 
-
+            // Booking configuration
             modelBuilder.Entity<Booking>(entity =>
             {
                 entity.HasKey(b => b.BookingId);
@@ -227,7 +233,7 @@ namespace MovieTicketBooking.Data
                         "[TotalAmount] >= 0"));
             });
 
-
+            // BookingSeat configuration
             modelBuilder.Entity<BookingSeat>(entity =>
             {
                 entity.HasKey(bs => bs.BookingSeatId);
@@ -251,11 +257,13 @@ namespace MovieTicketBooking.Data
                         "CK_BookingSeats_Price",
                         "[Price] >= 0"));
             });
+
+            // Application User relationship
             modelBuilder.Entity<Booking>()
-            .HasOne(b => b.User)
-            .WithMany()
-            .HasForeignKey(b => b.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(b => b.User)
+                .WithMany()
+                .HasForeignKey(b => b.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

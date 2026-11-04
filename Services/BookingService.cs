@@ -262,6 +262,7 @@ namespace MovieTicketBooking.Services
 
                 booking.Status = "Cancelled";
 
+
                 await _bookingRepository.UpdateAsync(booking);
                 await _context.SaveChangesAsync();
 

@@ -1,0 +1,23 @@
+
+.hero-section {
+  background: linear-gradient( rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75) ), linear-gradient(135deg, #343a40, #8b0000);
+  padding: 100px 20px;
+}
+
+.navbar-brand {
+  font-size: 24px;
+}
+
+.card {
+  border: none;
+  border-radius: 12px;
+  transition: transform 0.2s ease;
+}
+
+  .card:hover {
+    transform: translateY(-5px);
+  }
+
+footer {
+  margin-top: 50px;
+}

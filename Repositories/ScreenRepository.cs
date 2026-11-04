@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Microsoft.EntityFrameworkCore;
 using MovieTicketBooking.Data;
-using MovieTicketBooking.Models;
 using MovieTicketBooking.Repositories.Interfaces;
 
 namespace MovieTicketBooking.Repositories
@@ -15,7 +15,8 @@ namespace MovieTicketBooking.Repositories
         }
 
         // Add a new screen
-        public async Task<Screen> AddAsync(Screen screen)
+        public async Task<MovieTicketBooking.Models.Screen> AddAsync(
+            MovieTicketBooking.Models.Screen screen)
         {
             await _context.Screens.AddAsync(screen);
             await _context.SaveChangesAsync();
@@ -24,20 +25,22 @@ namespace MovieTicketBooking.Repositories
         }
 
         // Get all screens
-        public async Task<List<Screen>> GetAllAsync()
+        public async Task<List<MovieTicketBooking.Models.Screen>> GetAllAsync()
         {
             return await _context.Screens.ToListAsync();
         }
 
         // Get screen by ID
-        public async Task<Screen?> GetByIdAsync(int screenId)
+        public async Task<MovieTicketBooking.Models.Screen?> GetByIdAsync(
+            int screenId)
         {
             return await _context.Screens
                 .FirstOrDefaultAsync(s => s.ScreenId == screenId);
         }
 
         // Get screens by Theatre ID
-        public async Task<List<Screen>> GetByTheatreIdAsync(int theatreId)
+        public async Task<List<MovieTicketBooking.Models.Screen>> GetByTheatreIdAsync(
+            int theatreId)
         {
             return await _context.Screens
                 .Where(s => s.TheatreId == theatreId)
@@ -45,14 +48,16 @@ namespace MovieTicketBooking.Repositories
         }
 
         // Update screen
-        public async Task UpdateAsync(Screen screen)
+        public async Task UpdateAsync(
+            MovieTicketBooking.Models.Screen screen)
         {
             _context.Screens.Update(screen);
             await _context.SaveChangesAsync();
         }
 
         // Delete screen
-        public async Task DeleteAsync(Screen screen)
+        public async Task DeleteAsync(
+            MovieTicketBooking.Models.Screen screen)
         {
             _context.Screens.Remove(screen);
             await _context.SaveChangesAsync();

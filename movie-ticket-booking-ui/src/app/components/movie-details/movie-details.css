@@ -1,0 +1,14 @@
+
+.card {
+  border: none;
+  border-radius: 12px;
+}
+
+.card-body {
+  min-height: 300px;
+}
+
+.badge {
+  font-size: 14px;
+  padding: 8px 12px;
+}

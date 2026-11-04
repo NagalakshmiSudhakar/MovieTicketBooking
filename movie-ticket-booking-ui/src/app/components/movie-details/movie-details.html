@@ -1,0 +1,123 @@
+
+<div class="container my-5">
+
+  <!-- Back Button -->
+  <a routerLink="/" class="btn btn-outline-dark mb-4">
+    ← Back to Movies
+  </a>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage()" class="alert alert-danger">
+    {{ errorMessage() }}
+  </div>
+
+  <!-- Movie Details -->
+  <div *ngIf="movie() as selectedMovie" class="card shadow-sm mb-5">
+    <div class="card-body p-4">
+
+      <h2 class="fw-bold">{{ selectedMovie.title }}</h2>
+
+      <p>
+        {{ selectedMovie.description || 'No description available.' }}
+      </p>
+
+      <span class="badge bg-danger">
+        {{ selectedMovie.genre }}
+      </span>
+
+      <div class="mt-3">
+        <p><strong>Language:</strong> {{ selectedMovie.language }}</p>
+        <p><strong>Duration:</strong> {{ selectedMovie.durationMinutes }} minutes</p>
+        <p>
+          <strong>Release Date:</strong>
+          {{ selectedMovie.releaseDate | date:'dd MMM yyyy' }}
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Available Theatres -->
+
+  <section class="container my-5">
+
+    <h2 class="mb-4">Available Theatres</h2>
+
+    @if (theatreGroups().length > 0) {
+
+    @for (group of theatreGroups(); track group.theatre.theatreId) {
+
+    <div class="card shadow-sm mb-4">
+
+      <div class="card-body">
+
+        <h4 class="card-title">
+          {{ group.theatre.name }}
+        </h4>
+
+        <p class="text-muted">
+          <i class="bi bi-geo-alt"></i>
+          {{ group.theatre.location }}
+        </p>
+
+        <h6 class="mt-3 mb-3">Available Shows</h6>
+
+        <div class="row g-3">
+
+          @for (show of group.shows; track show.showId) {
+
+          <div class="col-md-4 col-lg-3">
+
+            <div class="border rounded p-3">
+
+              <p class="mb-1">
+                <strong>Screen:</strong>
+                {{ show.screenId }}
+              </p>
+
+              <p class="mb-1">
+                <strong>Date:</strong>
+                {{ show.startTime | date:'dd MMM yyyy' }}
+              </p>
+
+              <p class="mb-1">
+                <strong>Time:</strong>
+                {{ show.startTime | date:'hh:mm a' }}
+              </p>
+
+              <p class="mb-2">
+                <strong>Price:</strong>
+                ₹{{ show.ticketPrice }}
+              </p>
+
+              <button class="btn btn-danger w-100"
+                      [routerLink]="['/shows', show.showId, 'seats']">
+
+                Select Seats
+
+              </button>
+
+            </div>
+
+          </div>
+
+          }
+
+        </div>
+
+      </div>
+
+    </div>
+
+    }
+
+    } @else {
+
+    <div class="alert alert-info">
+      No theatres currently have shows for this movie.
+    </div>
+
+    }
+
+  </section>
+</div>

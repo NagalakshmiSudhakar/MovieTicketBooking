@@ -1,0 +1,133 @@
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand fw-bold" routerLink="/">
+      🎬 MovieTicket
+    </a>
+
+    <button class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link active" routerLink="/">Home</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/" fragment="movies">Movies</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-section text-center text-white">
+  <div class="container">
+    <h1 class="display-4 fw-bold">Book Your Movie Tickets</h1>
+
+    <p class="lead">
+      Discover movies, choose your favourite seats and enjoy the show.
+    </p>
+
+    <a routerLink="/"
+       fragment="movies"
+       class="btn btn-danger btn-lg mt-3">
+      Explore Movies
+    </a>
+  </div>
+</section>
+
+<!-- Movies Section -->
+<section class="container my-5" id="movies">
+
+  <h2 class="fw-bold mb-4">Now Showing</h2>
+
+  <!-- Search Movies -->
+  <div class="row mb-4">
+    <div class="col-md-6 mx-auto">
+      <div class="input-group">
+        <input #searchInput
+               type="text"
+               class="form-control"
+               placeholder="Search movies by title..."
+               (keyup.enter)="searchMovies(searchInput.value)" />
+
+        <button class="btn btn-danger"
+                (click)="searchMovies(searchInput.value)">
+          Search
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage()" class="alert alert-danger">
+    {{ errorMessage() }}
+  </div>
+
+  <!-- No Movies Available -->
+  <div *ngIf="!errorMessage() && movies().length === 0"
+       class="text-center py-5">
+    <h5>No movies available</h5>
+  </div>
+
+  <!-- Movie Cards -->
+  <div class="row g-4" *ngIf="movies().length > 0">
+
+    <div class="col-md-4 col-lg-3"
+         *ngFor="let movie of movies()">
+
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+
+          <h5 class="card-title fw-bold">
+            {{ movie.title }}
+          </h5>
+
+          <p>
+            {{ movie.description || 'No description available.' }}
+          </p>
+
+          <span class="badge bg-danger">
+            {{ movie.genre }}
+          </span>
+
+          <p class="mt-3">
+            <strong>Language:</strong> {{ movie.language }}
+          </p>
+
+          <p>
+            <strong>Duration:</strong>
+            {{ movie.durationMinutes }} minutes
+          </p>
+
+          <p>
+            <strong>Release:</strong>
+            {{ movie.releaseDate | date:'dd MMM yyyy' }}
+          </p>
+
+          <a [routerLink]="['/movies', movie.movieId]"
+             class="btn btn-danger w-100">
+            View Details
+          </a>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+<!-- Footer -->
+<footer class="bg-dark text-white text-center py-3">
+  <p class="mb-0">
+    © 2026 MovieTicket Booking System
+  </p>
+</footer>

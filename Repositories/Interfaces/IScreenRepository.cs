@@ -1,19 +1,19 @@
-﻿using MovieTicketBooking.Models;
-
+﻿
 namespace MovieTicketBooking.Repositories.Interfaces
 {
     public interface IScreenRepository
     {
-        Task<Screen> AddAsync(Screen screen);
+        Task<MovieTicketBooking.Models.Screen> AddAsync(
+            MovieTicketBooking.Models.Screen screen);
 
-        Task<List<Screen>> GetAllAsync();
+        Task<List<MovieTicketBooking.Models.Screen>> GetAllAsync();
 
-        Task<Screen?> GetByIdAsync(int screenId);
+        Task<MovieTicketBooking.Models.Screen?> GetByIdAsync(int screenId);
 
-        Task<List<Screen>> GetByTheatreIdAsync(int theatreId);
+        Task<List<MovieTicketBooking.Models.Screen>> GetByTheatreIdAsync(int theatreId);
 
-        Task UpdateAsync(Screen screen);
+        Task UpdateAsync(MovieTicketBooking.Models.Screen screen);
 
-        Task DeleteAsync(Screen screen);
+        Task DeleteAsync(MovieTicketBooking.Models.Screen screen);
     }
 }

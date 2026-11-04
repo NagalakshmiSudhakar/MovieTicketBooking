@@ -1,0 +1,55 @@
+
+<div class="container my-5">
+
+  <h2 class="fw-bold text-center mb-2">Select Your Seats</h2>
+
+  <p class="text-center text-muted mb-4">
+    Show ID: {{ showId }}
+  </p>
+
+  <!-- Screen -->
+  <div class="screen-container mb-5">
+    <div class="screen">SCREEN</div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage()" class="alert alert-danger">
+    {{ errorMessage() }}
+  </div>
+
+  <!-- Seat Status Legend -->
+  <div class="d-flex justify-content-center gap-4 mb-4 flex-wrap">
+    <div>
+      <span class="seat available"></span>
+      Available
+    </div>
+
+    <div>
+      <span class="seat booked"></span>
+      Booked
+    </div>
+  </div>
+
+  <!-- Seat Layout -->
+  <div class="seat-layout" *ngIf="seats().length > 0">
+
+    <div class="seat-row">
+      <div *ngFor="let seat of seats()"
+           class="seat"
+           [ngClass]="{
+        'available': seat.status === 'Available',
+        'booked': seat.status === 'Booked'
+      }">
+        {{ seat.seatLabel }}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- No Seats -->
+  <div *ngIf="seats().length === 0 && !errorMessage()"
+       class="text-center alert alert-info">
+    No seats available.
+  </div>
+
+</div>

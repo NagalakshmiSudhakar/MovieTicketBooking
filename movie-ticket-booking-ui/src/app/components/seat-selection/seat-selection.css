@@ -1,0 +1,49 @@
+
+.screen-container {
+  display: flex;
+  justify-content: center;
+}
+
+.screen {
+  width: 70%;
+  padding: 12px;
+  text-align: center;
+  background-color: #dee2e6;
+  border-radius: 50% 50% 8px 8px;
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+
+.seat-layout {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.seat-row {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.seat {
+  width: 50px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px 8px 4px 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.available {
+  background-color: #198754;
+  color: white;
+}
+
+.booked {
+  background-color: #dc3545;
+  color: white;
+}
