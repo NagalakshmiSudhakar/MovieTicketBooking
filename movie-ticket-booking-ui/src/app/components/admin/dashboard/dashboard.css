@@ -1,0 +1,144 @@
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f7f4fc;
+}
+
+.sidebar {
+  width: 250px;
+  background: #49336f;
+  color: white;
+  padding: 25px 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+  .brand h2 {
+    font-size: 21px;
+    font-weight: 700;
+  }
+
+  .brand span {
+    color: #d9c9ee;
+    font-size: 13px;
+  }
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+  .sidebar nav a {
+    padding: 13px;
+    color: #eee5fc;
+    text-decoration: none;
+    border-radius: 9px;
+  }
+
+    .sidebar nav a:hover,
+    .sidebar nav a.active {
+      background: #8965b7;
+      color: white;
+    }
+
+.logout-btn {
+  margin-top: auto;
+  padding: 12px;
+  background: #8965b7;
+  color: white;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.main-content {
+  flex: 1;
+  padding: 35px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+  .topbar h2 {
+    color: #49336f;
+    font-weight: 700;
+  }
+
+  .topbar p {
+    color: #81758e;
+  }
+
+.admin-profile {
+  background: white;
+  padding: 12px 18px;
+  border-radius: 12px;
+  color: #63469a;
+}
+
+.welcome-card {
+  padding: 35px;
+  border-radius: 18px;
+  background: linear-gradient(120deg, #8965b7, #b69bd9);
+  color: white;
+  margin-bottom: 30px;
+}
+
+  .welcome-card h1 {
+    font-weight: 700;
+  }
+
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+}
+
+.dashboard-card {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(91, 62, 130, 0.08);
+}
+
+  .dashboard-card span {
+    font-size: 30px;
+  }
+
+  .dashboard-card h3 {
+    color: #49336f;
+    margin-top: 12px;
+  }
+
+  .dashboard-card p {
+    color: #81758e;
+  }
+
+  .dashboard-card a {
+    color: #8059b1;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 190px;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+
+  .dashboard-cards {
+    grid-template-columns: 1fr;
+  }
+}

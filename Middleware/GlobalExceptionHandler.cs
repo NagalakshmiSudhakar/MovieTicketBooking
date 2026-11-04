@@ -22,6 +22,7 @@ namespace MovieTicketBooking.Middleware
         {
             var statusCode = exception switch
             {
+                UnauthorizedException => StatusCodes.Status401Unauthorized,
                 NotFoundException => StatusCodes.Status404NotFound,
                 ConflictException => StatusCodes.Status409Conflict,
                 BadRequestException => StatusCodes.Status400BadRequest,

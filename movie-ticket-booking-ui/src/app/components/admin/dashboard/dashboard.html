@@ -1,0 +1,91 @@
+<div class="admin-layout">
+
+  <aside class="sidebar">
+
+    <div class="brand">
+      <h2>🎬 CineLavender</h2>
+      <span>Admin Panel</span>
+    </div>
+
+    <nav>
+      <a routerLink="/admin" routerLinkActive="active">
+        <span>📊</span> Dashboard
+      </a>
+
+      <a routerLink="/admin/movies">
+        <span>🎬</span> Movies
+      </a>
+
+      <a routerLink="/admin/theatres">
+        <span>🏢</span> Theatres
+      </a>
+
+      <a routerLink="/admin/screens">
+        <span>🖥️</span> Screens
+      </a>
+
+      <a routerLink="/admin/shows">
+        <span>🕒</span> Shows
+      </a>
+    </nav>
+
+    <button class="logout-btn" (click)="logout()">
+      Logout
+    </button>
+
+  </aside>
+
+  <main class="main-content">
+
+    <header class="topbar">
+      <div>
+        <h2>Admin Dashboard</h2>
+        <p>Welcome back, {{ adminName }}!</p>
+      </div>
+
+      <div class="admin-profile">
+        <span>👤</span>
+        Administrator
+      </div>
+    </header>
+
+    <section class="welcome-card">
+      <h1>Welcome to CineLavender 💜</h1>
+      <p>Manage your movie ticket booking platform from one place.</p>
+    </section>
+
+    <section class="dashboard-cards">
+
+      <div class="dashboard-card">
+        <span>🎬</span>
+        <h3>Movies</h3>
+        <p>Manage your movie collection</p>
+        <a routerLink="/admin/movies">Manage Movies →</a>
+      </div>
+
+      <div class="dashboard-card">
+        <span>🏢</span>
+        <h3>Theatres</h3>
+        <p>Manage theatre information</p>
+        <a routerLink="/admin/theatres">Manage Theatres →</a>
+      </div>
+
+      <div class="dashboard-card">
+        <span>🖥️</span>
+        <h3>Screens</h3>
+        <p>Manage theatre screens</p>
+        <a routerLink="/admin/screens">Manage Screens →</a>
+      </div>
+
+      <div class="dashboard-card">
+        <span>🕒</span>
+        <h3>Shows</h3>
+        <p>Manage movie show timings</p>
+        <a routerLink="/admin/shows">Manage Shows →</a>
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
