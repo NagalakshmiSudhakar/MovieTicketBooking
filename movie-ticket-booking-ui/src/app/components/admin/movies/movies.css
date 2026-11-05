@@ -115,7 +115,8 @@ th {
   font-weight: 600;
 }
 
-.edit-btn, .delete-btn {
+.edit-btn,
+.delete-btn {
   padding: 7px 11px;
   border: none;
   border-radius: 6px;
@@ -126,18 +127,23 @@ th {
   background: #e8ddf7;
   color: #694693;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
-
-  .edit-btn:hover {
-    background: #8965b7;
-    color: white;
-  }
 
 .delete-btn {
   background: #ffe5e8;
   color: #c03955;
-  cursor: not-allowed;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+  .delete-btn:hover {
+    background: #c03955;
+    color: white;
+  }
+
+.edit-btn:hover {
+  background: #694693;
+  color: white;
 }
 
 .message, .empty-message {

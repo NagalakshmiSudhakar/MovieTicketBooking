@@ -180,6 +180,42 @@ export class Movies implements OnInit {
     });
   }
 
+  deleteMovie(movie: Movie): void {
+
+    const confirmDelete = confirm(
+      `Are you sure you want to delete "${movie.title}"?`
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    this.errorMessage.set('');
+    this.successMessage.set('');
+
+    this.movieService.deleteMovie(movie.movieId).subscribe({
+
+      next: () => {
+        this.successMessage.set(
+          'Movie deleted successfully!'
+        );
+
+        this.loadMovies();
+      },
+
+      error: (error) => {
+        console.error('Error deleting movie:', error);
+
+        this.errorMessage.set(
+          error.error?.detail ||
+          error.error?.message ||
+          'Unable to delete movie.'
+        );
+      }
+
+    });
+  }
+
   // Reset form
   resetForm(): void {
 

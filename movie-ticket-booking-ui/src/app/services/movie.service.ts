@@ -47,4 +47,9 @@ export class MovieService {
   ): Observable<Movie> {
     return this.http.put<Movie>(`${this.apiUrl}/${id}`, request);
   }
+
+  // Delete a movie (Admin only)
+  deleteMovie(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }
